@@ -34,10 +34,14 @@ import json
 import sys
 import pkg_resources
 import argparse
+import time
 import getpass
 import os
+import pytz
+from dateutil import parser
 from os.path import expanduser
 from bs4 import BeautifulSoup
+from timezonefinder import TimezoneFinder
 
 
 class Solution:
@@ -198,6 +202,7 @@ def devlist_from_parser(args):
 
 
 def spot_data(spot_id):  #'SPOT-0222'
+    obj = TimezoneFinder()
     params = {"spotterId": [spot_id], "includeSurfaceTempData": True}
     headers = {
         "token": tokenize(),
@@ -207,10 +212,21 @@ def spot_data(spot_id):  #'SPOT-0222'
     )
     if response.status_code == 200:
         spotter = response.json()
-        # print(spotter)
-        print(f"Readings for Spotter with Spotter ID: {spotter['data']['spotterId']}")
+        for segments in spotter['data']['surfaceTemp']:
+            print(segments)
+        print(f'Fetching info for Spotter {spot_id}'+'\n')
+        latitude = spotter["data"]["waves"][-1]["latitude"]
+        longitude = spotter["data"]["waves"][-1]["longitude"]
+        time_zone = obj.timezone_at(lat=float(latitude), lng=float(longitude))
+        tz = pytz.timezone(time_zone)
+        now_utc = parser.parse(spotter["data"]["waves"][-1]["timestamp"])
+        now_kl = now_utc.replace(tzinfo=pytz.utc).astimezone(tz)
+        print(f'Last updated UTC time from spotter {spot_id} : {now_utc}')
+        print(f'Last updated local time from spotter {spot_id} : {now_kl}')
+        print(f'Last location from spotter {spot_id} lat,long: {spotter["data"]["waves"][-1]["latitude"]},{spotter["data"]["waves"][-1]["longitude"]}')
+        time.sleep(5) # add a time lag to read time and location info
         for readings in spotter["data"]["waves"]:
-            print(readings)
+            print(json.dumps(readings,indent=2))
 
 
 def spot_data_from_parser(args):
