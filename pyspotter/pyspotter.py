@@ -200,10 +200,44 @@ def devlist():
 def devlist_from_parser(args):
     devlist()
 
+def spot_check(spot_id):
+    dic = {}
+    obj = TimezoneFinder()
+    params = {"spotterId": spot_id}
+    headers = {
+        "token": tokenize(),
+    }
+    response = requests.get(
+        "https://api.sofarocean.com/api/latest-data", headers=headers, params=params
+    )
+    if response.status_code == 200:
+        spotter = response.json()
+        print(f'Fetching info for Spotter {spot_id}'+'\n')
+        for key,value in spotter['data'].items():
+            if key != 'frequencyData' and key != 'track' and key != 'waves':
+                dic[key]=value
+            #print(key,value)
+        latitude = spotter["data"]["waves"][-1]["latitude"]
+        longitude = spotter["data"]["waves"][-1]["longitude"]
+        time_zone = obj.timezone_at(lat=float(latitude), lng=float(longitude))
+        tz = pytz.timezone(time_zone)
+        now_utc = parser.parse(spotter["data"]["waves"][-1]["timestamp"])
+        now_kl = now_utc.replace(tzinfo=pytz.utc).astimezone(tz)
+        dic['last updated (UTC time)']=str(now_utc)
+        dic['last updated (spotter local time)'] = str(now_kl)
+        dic['latitude'] = spotter["data"]["waves"][-1]["latitude"]
+        dic['longitude'] = spotter["data"]["waves"][-1]["longitude"]
+        print(json.dumps(dic, indent=2, sort_keys=False))
+    else:
+        print(f'Spot check failed with error code {response.status_code}')
+
+def spotcheck_from_parser(args):
+    spot_check(spot_id=args.sid)
+
 
 def spot_data(spot_id):  #'SPOT-0222'
     obj = TimezoneFinder()
-    params = {"spotterId": [spot_id], "includeSurfaceTempData": True}
+    params = {"spotterId": [spot_id], "includeSurfaceTempData": True,"includeWindData":True}
     headers = {
         "token": tokenize(),
     }
@@ -215,19 +249,10 @@ def spot_data(spot_id):  #'SPOT-0222'
         for segments in spotter['data']['surfaceTemp']:
             print(segments)
         print(f'Fetching info for Spotter {spot_id}'+'\n')
-        latitude = spotter["data"]["waves"][-1]["latitude"]
-        longitude = spotter["data"]["waves"][-1]["longitude"]
-        time_zone = obj.timezone_at(lat=float(latitude), lng=float(longitude))
-        tz = pytz.timezone(time_zone)
-        now_utc = parser.parse(spotter["data"]["waves"][-1]["timestamp"])
-        now_kl = now_utc.replace(tzinfo=pytz.utc).astimezone(tz)
-        print(f'Last updated UTC time from spotter {spot_id} : {now_utc}')
-        print(f'Last updated local time from spotter {spot_id} : {now_kl}')
-        print(f'Last location from spotter {spot_id} lat,long: {spotter["data"]["waves"][-1]["latitude"]},{spotter["data"]["waves"][-1]["longitude"]}')
-        time.sleep(5) # add a time lag to read time and location info
         for readings in spotter["data"]["waves"]:
             print(json.dumps(readings,indent=2))
-
+        for readings in spotter["data"]["wind"]:
+            print(json.dumps(readings,indent=2))
 
 def spot_data_from_parser(args):
     spot_data(spot_id=args.sid)
@@ -251,6 +276,15 @@ def main(args=None):
         "devlist", help="Print lists of devices available under your account"
     )
     parser_devlist.set_defaults(func=devlist_from_parser)
+
+    parser_spotcheck = subparsers.add_parser(
+        "spot_check", help="Spot check a Spotter location and time"
+    )
+    required_named = parser_spotcheck.add_argument_group(
+        "Required named arguments."
+    )
+    required_named.add_argument("--sid", help="Spotter ID", required=True)
+    parser_spotcheck.set_defaults(func=spotcheck_from_parser)
 
     parser_spot_data = subparsers.add_parser(
         "spot_data", help="Print Spotter Data based on Spotter ID"
