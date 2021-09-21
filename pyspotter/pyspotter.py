@@ -268,17 +268,18 @@ def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
         if (
             not "surfaceTemp" in spotter["data"]
             or len(spotter["data"]["surfaceTemp"]) == 0
+            and dtype == 'st'
         ):
-            print("No surfaceTemp data found")
-        if not "waves" in spotter["data"] or len(spotter["data"]["waves"]) == 0:
-            print("No waves data found")
+            sys.exit("No surfaceTemp data found")
+        if not "waves" in spotter["data"] or len(spotter["data"]["waves"]) == 0 and dtype == 'wave':
+            sys.exit("No waves data found")
         else:
             for readings in spotter["data"]["waves"]:
                 readings["date"] = readings["timestamp"].split("T")[0]
                 readings["spotter_id"] = spot_id
                 waves_list.append(readings)
-        if not "wind" in spotter["data"] or len(spotter["data"]["wind"]) == 0:
-            print("No wind data found")
+        if not "wind" in spotter["data"] or len(spotter["data"]["wind"]) == 0 and dtype == 'wind':
+            sys.exit("No wind data found")
         else:
             for readings in spotter["data"]["wind"]:
                 readings["date"] = readings["timestamp"].split("T")[0]
