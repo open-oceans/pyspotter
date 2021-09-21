@@ -141,6 +141,11 @@ pyspotter spot-data --sid 1234 --dtype wave --folder "full path to folder"
 
 ## Changelog
 
+#### v0.0.4
+- added spot id to spot data export and metadata
+- gracefully handles missing data and better error handling
+- general improvements
+
 #### v0.0.3
 - added spot check tool to get latest info about spotter
 - spot data now exports CSV after grouping by date
