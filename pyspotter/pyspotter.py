@@ -35,9 +35,11 @@ import sys
 import pkg_resources
 import argparse
 import time
+import csv
 import getpass
 import os
 import pytz
+from itertools import groupby
 from dateutil import parser
 from os.path import expanduser
 from bs4 import BeautifulSoup
@@ -201,6 +203,8 @@ def devlist_from_parser(args):
     devlist()
 
 def spot_check(spot_id):
+    if not spot_id.startswith("SPOT-"):
+        spot_id = f'SPOT-{spot_id}'
     dic = {}
     obj = TimezoneFinder()
     params = {"spotterId": spot_id}
@@ -235,7 +239,11 @@ def spotcheck_from_parser(args):
     spot_check(spot_id=args.sid)
 
 
-def spot_data(spot_id):  #'SPOT-0222'
+def spot_data(spot_id,dtype,folder):  #'SPOT-0222'
+    waves_list=[]
+    wind_list=[]
+    if not spot_id.startswith("SPOT-"):
+        spot_id = f'SPOT-{spot_id}'
     obj = TimezoneFinder()
     params = {"spotterId": [spot_id], "includeSurfaceTempData": True,"includeWindData":True}
     headers = {
@@ -250,12 +258,41 @@ def spot_data(spot_id):  #'SPOT-0222'
             print(segments)
         print(f'Fetching info for Spotter {spot_id}'+'\n')
         for readings in spotter["data"]["waves"]:
-            print(json.dumps(readings,indent=2))
+            readings['date']=readings['timestamp'].split('T')[0]
+            waves_list.append(readings)
+
         for readings in spotter["data"]["wind"]:
-            print(json.dumps(readings,indent=2))
+            readings['date']=readings['timestamp'].split('T')[0]
+            wind_list.append(readings)
+
+    if dtype == "wave":
+        csv_columns = ["significantWaveHeight","peakPeriod","meanPeriod","peakDirection","peakDirectionalSpread","meanDirection","meanDirectionalSpread","timestamp","latitude","longitude","date"]
+        main_list=waves_list
+    elif dtype == "wind":
+        csv_columns = ["speed","direction","seasurfaceId","latitude","longitude","timestamp","date"]
+        main_list=wind_list
+    # define a fuction for key
+    def key_func(k):
+        return k['date']
+
+    # sort INFO data by 'company' key.
+    INFO = sorted(main_list, key=key_func)
+
+
+    for key, value in groupby(INFO, key_func):
+        print(f'Processing {spot_id}_{key}_{dtype}')
+        dict_data=list(value)
+        try:
+            with open(os.path.join(folder,f'{spot_id}_{key}_{dtype}.csv'), 'w') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=csv_columns,delimiter=",", lineterminator="\n")
+                writer.writeheader()
+                for data in dict_data:
+                    writer.writerow(data)
+        except IOError:
+            print("I/O error")
 
 def spot_data_from_parser(args):
-    spot_data(spot_id=args.sid)
+    spot_data(spot_id=args.sid,dtype=args.dtype,folder=args.folder)
 
 
 def main(args=None):
@@ -278,7 +315,7 @@ def main(args=None):
     parser_devlist.set_defaults(func=devlist_from_parser)
 
     parser_spotcheck = subparsers.add_parser(
-        "spot_check", help="Spot check a Spotter location and time"
+        "spot-check", help="Spot check a Spotter location and time"
     )
     required_named = parser_spotcheck.add_argument_group(
         "Required named arguments."
@@ -287,10 +324,14 @@ def main(args=None):
     parser_spotcheck.set_defaults(func=spotcheck_from_parser)
 
     parser_spot_data = subparsers.add_parser(
-        "spot_data", help="Print Spotter Data based on Spotter ID"
+        "spot-data", help="Export Spotter Data based on Spotter ID & grouped by date"
     )
-    optional_named = parser_spot_data.add_argument_group("Optional named arguments")
-    optional_named.add_argument("--sid", help="Spotter ID", default=None)
+    required_named = parser_spot_data.add_argument_group(
+        "Required named arguments."
+    )
+    required_named.add_argument("--sid", help="Spotter ID", required=True)
+    required_named.add_argument("--dtype", help="Data type: wind/wave", required=True)
+    required_named.add_argument("--folder", help="Folder to export CSV data", required=True)
     parser_spot_data.set_defaults(func=spot_data_from_parser)
 
     args = parser.parse_args()
