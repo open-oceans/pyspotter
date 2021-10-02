@@ -1,4 +1,4 @@
-# pyspotter
+# pyspotter: Simple CLI for SofarOcean API
 
 ![](https://tokei.rs/b1/github/samapriya/pyspotter?category=code)
 ![](https://tokei.rs/b1/github/samapriya/pyspotter?category=files)
@@ -7,7 +7,6 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/pyspotter)
 ![PyPI](https://img.shields.io/pypi/v/pyspotter)
 
-Simple CLI for SofarOcean API
 
 ## Table of contents
 * [Installation](#installation)
