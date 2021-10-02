@@ -1,10 +1,11 @@
 # pyspotter: Simple CLI for SofarOcean API
 
+[![Twitter URL](https://img.shields.io/twitter/follow/samapriyaroy?style=social)](https://twitter.com/intent/follow?screen_name=samapriyaroy)
 ![](https://tokei.rs/b1/github/samapriya/pyspotter?category=code)
 ![](https://tokei.rs/b1/github/samapriya/pyspotter?category=files)
 [![CI pyspotter](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml/badge.svg)](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml)
 ![PyPI - License](https://img.shields.io/pypi/l/pyspotter)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/pyspotter)
+[![Downloads](https://pepy.tech/badge/pyspotter)](https://pepy.tech/project/pyspotter)
 ![PyPI](https://img.shields.io/pypi/v/pyspotter)
 
 
