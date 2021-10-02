@@ -1,6 +1,6 @@
 # pyspotter
 
-![Twitter Follow](https://img.shields.io/twitter/follow/samapriyaroy?style=social)
+[![Twitter URL](https://img.shields.io/twitter/follow/samapriyaroy?style=social)](https://twitter.com/intent/follow?screen_name=samapriyaroy)
 ![](https://tokei.rs/b1/github/samapriya/pyspotter?category=code)
 ![](https://tokei.rs/b1/github/samapriya/pyspotter?category=files)
 [![CI pyspotter](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml/badge.svg)](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml)
