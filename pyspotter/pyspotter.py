@@ -246,6 +246,7 @@ def spotcheck_from_parser(args):
 def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
     waves_list = []
     wind_list = []
+    sst_list = []
     if not spot_id.startswith("SPOT-"):
         spot_id = f"SPOT-{spot_id}"
     obj = TimezoneFinder()
@@ -262,23 +263,34 @@ def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
     )
     if response.status_code == 200:
         spotter = response.json()
-        # for segments in spotter['data']['surfaceTemp']:
-        #     print(segments)
-        print(f"Fetching info for Spotter {spot_id}" + "\n")
+        print("\n" + f"Fetching info for Spotter {spot_id}" + "\n")
         if (
             not "surfaceTemp" in spotter["data"]
             or len(spotter["data"]["surfaceTemp"]) == 0
-            and dtype == 'st'
+            and dtype == "sst"
         ):
             sys.exit("No surfaceTemp data found")
-        if not "waves" in spotter["data"] or len(spotter["data"]["waves"]) == 0 and dtype == 'wave':
+        else:
+            for readings in spotter["data"]["surfaceTemp"]:
+                readings["date"] = readings["timestamp"].split("T")[0]
+                readings["spotter_id"] = spot_id
+                sst_list.append(readings)
+        if (
+            not "waves" in spotter["data"]
+            or len(spotter["data"]["waves"]) == 0
+            and dtype == "wave"
+        ):
             sys.exit("No waves data found")
         else:
             for readings in spotter["data"]["waves"]:
                 readings["date"] = readings["timestamp"].split("T")[0]
                 readings["spotter_id"] = spot_id
                 waves_list.append(readings)
-        if not "wind" in spotter["data"] or len(spotter["data"]["wind"]) == 0 and dtype == 'wind':
+        if (
+            not "wind" in spotter["data"]
+            or len(spotter["data"]["wind"]) == 0
+            and dtype == "wind"
+        ):
             sys.exit("No wind data found")
         else:
             for readings in spotter["data"]["wind"]:
@@ -318,6 +330,16 @@ def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
             "spotter_id",
         ]
         main_list = wind_list
+    elif dtype == "sst":
+        csv_columns = [
+            "degrees",
+            "latitude",
+            "longitude",
+            "timestamp",
+            "date",
+            "spotter_id",
+        ]
+        main_list = sst_list
     # define a fuction for key
     def key_func(k):
         return k["date"]
@@ -326,7 +348,7 @@ def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
     INFO = sorted(main_list, key=key_func)
 
     for key, value in groupby(INFO, key_func):
-        print(f"Processing {spot_id}_{key}_{dtype}")
+        print(f"Processing {spot_id}_{key}_{dtype}.csv")
         dict_data = list(value)
         try:
             with open(
@@ -377,7 +399,9 @@ def main(args=None):
     )
     required_named = parser_spot_data.add_argument_group("Required named arguments.")
     required_named.add_argument("--sid", help="Spotter ID", required=True)
-    required_named.add_argument("--dtype", help="Data type: wind/wave", required=True)
+    required_named.add_argument(
+        "--dtype", help="Data type: wind/wave/sst", required=True
+    )
     required_named.add_argument(
         "--folder", help="Folder to export CSV data", required=True
     )

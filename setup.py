@@ -6,7 +6,7 @@ def readme():
         return f.read()
 setuptools.setup(
     name='pyspotter',
-    version='0.0.4',
+    version='0.0.5',
     packages=find_packages(),
     url='https://github.com/samapriya/pyspotter',
     install_requires=['requests>=2.23.1','timezonefinder>=5.2.0','pytz>=2020.1','beautifulsoup4>=4.9.3','python_dateutil>=2.8.2'],

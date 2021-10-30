@@ -117,7 +117,7 @@ pyspotter spot-check --sid 0320
 
 
 ### pyspotter spotdata
-This tool was designed to get the datasets out of the spotter. It seems that API currently returns about a month of data, and the best way to group it was using dates. This script uses the result JSON objects, and adds a date field from the timestamp to make the grouping easy, since timestamps are unique. This then writes these CSV file with column headers and can export both wind and wave data as needed.
+This tool was designed to get the datasets out of the spotter. It seems that API currently limited temporal data, and the best way to group seemed to be using dates. This script uses the result JSON objects, and adds a date field from the timestamp to make the grouping easy, since timestamps are unique. This then writes these CSV file with column headers and can export both wind and wave data as needed.
 
 ```
 usage: pyspotter spot-data [-h] --sid SID --dtype DTYPE --folder FOLDER
@@ -127,7 +127,7 @@ optional arguments:
 
 Required named arguments.:
   --sid SID        Spotter ID
-  --dtype DTYPE    Data type: wind/wave
+  --dtype DTYPE    Data type: wind/wave/sst
   --folder FOLDER  Folder to export CSV data
 
 ```
@@ -140,6 +140,10 @@ pyspotter spot-data --sid 1234 --dtype wave --folder "full path to folder"
 
 
 ## Changelog
+
+#### v0.0.5
+- added sea surface temperature parsing for spot data
+- minor general improvements
 
 #### v0.0.4
 - added spot id to spot data export and metadata
