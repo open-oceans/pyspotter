@@ -15,3 +15,10 @@ This tool is an attempt to parse out some of the basic functionalities of the AP
 
 
 **Disclaimer: This is an unofficial tool. Is not licensed or endorsed by SofarOcean. It is created and maintained by Samapriya Roy.**
+
+#### Citation
+
+```
+Samapriya Roy. (2021). samapriya/pyspotter: Simple CLI for SofarOcean API (0.0.6).
+Zenodo. https://doi.org/10.5281/zenodo.5805519
+```
