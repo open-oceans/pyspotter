@@ -73,10 +73,14 @@ This allows you to save your authentication token, this is then used for authent
 
 ``` pyspotter auth```
 
+![pyspotter_auth](https://user-images.githubusercontent.com/6677629/147421243-6ca937c4-9614-42ae-9b49-82b3b2d4e286.gif)
+
 ### pyspotter reset
 For some reason if you need to reset your token , this will allow you to use your current authentication to reset and fetch your new token. This requires no user input
 
 ```pyspotter reset```
+
+![pyspotter_reset](https://user-images.githubusercontent.com/6677629/147421249-f2a7ceeb-7d24-41dd-bb50-6bef30913dbc.gif)
 
 ### pyspotter devlist
 This will simply print the names of all devices to which you have access, instead of trying to remember the list. This tool requires no user input.
@@ -96,6 +100,8 @@ usage is simply
 
 ### pyspotter spotcheck
 This tool is built to fetch simply the latest information from the spotter including battery, humidity, power and lat long. Since these spotter can move across multiple time zones, it uses the lat long to estimate the time zone and converts the UTC time to local time for the spotter.
+
+![pyspotter_devices](https://user-images.githubusercontent.com/6677629/147421382-138a03b9-d2e1-4f55-92be-15f88e1ac9e5.gif)
 
 ```
 pyspotter spot-check -h
@@ -118,6 +124,8 @@ pyspotter spot-check --sid 0320
 
 ### pyspotter spotdata
 This tool was designed to get the datasets out of the spotter. It seems that API currently limited temporal data, and the best way to group seemed to be using dates. This script uses the result JSON objects, and adds a date field from the timestamp to make the grouping easy, since timestamps are unique. This then writes these CSV file with column headers and can export both wind and wave data as needed.
+
+![pyspotter_spot-data](https://user-images.githubusercontent.com/6677629/147421473-c3833f2b-8e0e-4188-af88-dd19f30eb74d.gif)
 
 ```
 usage: pyspotter spot-data [-h] --sid SID --dtype DTYPE --folder FOLDER
