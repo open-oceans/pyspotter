@@ -7,6 +7,8 @@
 ![PyPI - License](https://img.shields.io/pypi/l/pyspotter)
 [![Downloads](https://pepy.tech/badge/pyspotter)](https://pepy.tech/project/pyspotter)
 ![PyPI](https://img.shields.io/pypi/v/pyspotter)
+[![Donate](https://img.shields.io/badge/Donate-Buy%20me%20a%20Chai-teal)](https://www.buymeacoffee.com/samapriya)
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/samapriya)
 
 
 SofarOcean is creating one of the largest commercial ocean observation grids with its smart buoys (spotters) & smart mooring. Spotter delivers high-fidelity, real-time wave, wind, and temperature data from anywhere. Sofar is also focused on providing this dataset to researchers and users of the data and this tool was an attemp to simple parse spotter information. They also have an offical client for doing many of these functions which can be found here [sofar-api-client-python](https://github.com/sofarocean/sofar-api-client-python). You can also find their [indepth API and documentation here](https://docs.sofarocean.com/)
