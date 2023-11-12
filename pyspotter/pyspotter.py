@@ -5,7 +5,7 @@ __copyright__ = """
 
 MIT License
 
-Copyright (c) 2021 Samapriya Roy
+Copyright (c) 2021-2024 Samapriya Roy
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,22 +29,31 @@ SOFTWARE.
 """
 __license__ = "MIT License"
 
-import requests
-import json
-import sys
-import pkg_resources
 import argparse
-import time
 import csv
+import datetime
 import getpass
+import json
+import logging
 import os
-import pytz
+import sys
+import time
 from itertools import groupby
-from dateutil import parser
 from os.path import expanduser
+
+import pandas as pd
+import pkg_resources
+import pytz
+import requests
 from bs4 import BeautifulSoup
+from dateutil import parser
+from dateutil.relativedelta import *
 from timezonefinder import TimezoneFinder
 
+# Set a custom log formatter
+logging.basicConfig(
+    level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
+)
 
 class Solution:
     def compareVersion(self, version1, version2):
@@ -202,6 +211,85 @@ def devlist():
 def devlist_from_parser(args):
     devlist()
 
+def marine_dashboard():
+    global_spotter_list = []
+    headers = {
+        "token": tokenize(),
+    }
+    params = {
+        'includeWindData': 'true',
+    }
+
+    response = requests.get('https://api.sofarocean.com/oceans-api/latest-data', params=params, headers=headers)
+    for spotter_results in response.json()['data']:
+        global_spotter_list.append(spotter_results)
+    return global_spotter_list
+
+def datetime_to_epoch_milliseconds(dt):
+    epoch = datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)
+    delta = dt - epoch
+    return int(delta.total_seconds() * 1000)
+
+def marine_global(sid,exp):
+    master_dashboard_ids = marine_dashboard()
+    headers = {
+        "token": tokenize(),
+    }
+    end = datetime.datetime.utcnow()
+    #end = end.replace(hour=0, minute=0, second=0, microsecond=0)
+    start = end + relativedelta(days=-15)
+    end = end.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    start = start.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    logging.info(
+        f"Searching between Start date {str(start)} and End date {str(end)}"
+    )
+    st = str(start).split('T')[0]
+    et = str(end).split('T')[0]
+    final_path = os.path.join(exp,f"{sid}_{st}_{et}.csv")
+    global_df_list =[]
+    if not os.path.exists(final_path):
+        try:
+            if sid=="global":
+                for i,sid in enumerate(master_dashboard_ids):
+                    response = requests.get(
+                        f'https://api.sofarocean.com/oceans-api/wave-data?spotterId={sid}&startDate={start}&endDate={end}',
+                        headers=headers,
+                    )
+                    if response.status_code == 200 and len(response.json()['data']['waves'])>0:
+                        print(f"Processed {i} of {len(master_dashboard_ids)} records",end="\r")
+                        #geojson_data = json.dumps(response.json(), indent=2)
+                        df = pd.DataFrame(response.json()['data']['waves'])
+                        df["timestamp"] = pd.to_datetime(df["timestamp"])
+                        df["system:time_start"] = df["timestamp"].apply(
+                            datetime_to_epoch_milliseconds
+                        )
+                        global_df_list.append(df)
+            else:
+                response = requests.get(
+                    f'https://api.sofarocean.com/oceans-api/wave-data?spotterId={sid}&startDate={start}&endDate={end}',
+                    headers=headers,
+                )
+                logging.info(f"Found a total of {len(response.json()['data']['waves'])} records")
+                #geojson_data = json.dumps(response.json(), indent=2)
+                df = pd.DataFrame(response.json()['data']['waves'])
+                df["timestamp"] = pd.to_datetime(df["timestamp"])
+                df["system:time_start"] = df["timestamp"].apply(
+                    datetime_to_epoch_milliseconds
+                )
+                global_df_list.append(df)
+            global_df = pd.concat(global_df_list, ignore_index=True)
+            global_cleaned = global_df.dropna()
+            global_cleaned.to_csv(final_path, index=False)
+            logging.info(f"Wrote {global_cleaned.shape[0]} records to csv {os.path.basename(final_path)}")
+        except Exception as error:
+            logging.error(error)
+    else:
+        logging.info(f"Marine dashboard export for {sid} already exists at {os.path.basename(final_path)}: SKIPPING")
+
+#marine_global(sid='global',exp=r'C:\tmp\aqua')
+#marine_info(sid='SPOT-30168D',exp=r'C:\tmp\aqua')
+def global_snapshot_from_parser(args):
+    marine_global(spot_id=args.sid,exp=args.export)
 
 def spot_check(spot_id):
     if not spot_id.startswith("SPOT-"):
