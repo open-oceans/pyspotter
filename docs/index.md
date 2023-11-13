@@ -1,12 +1,15 @@
 # pyspotter: Simple CLI for SofarOcean API
 
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=plastic&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/samapriya/)
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=flat&logo=medium&logoColor=white)](https://medium.com/@samapriyaroy)
 [![Twitter URL](https://img.shields.io/twitter/follow/samapriyaroy?style=social)](https://twitter.com/intent/follow?screen_name=samapriyaroy)
-![](https://tokei.rs/b1/github/samapriya/pyspotter?category=code)
-![](https://tokei.rs/b1/github/samapriya/pyspotter?category=files)
+[![Mastodon Follow](https://img.shields.io/mastodon/follow/109627075086849826?domain=https%3A%2F%2Fmapstodon.space%2F)](https://mapstodon.space/@samapriya)
 [![CI pyspotter](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml/badge.svg)](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml)
+[![Hits-of-Code](https://hitsofcode.com/github/open-oceans/pyspotter?branch=main)](https://hitsofcode.com/github/open-oceans/pyspotter?branch=main)
 ![PyPI - License](https://img.shields.io/pypi/l/pyspotter)
 [![Downloads](https://pepy.tech/badge/pyspotter)](https://pepy.tech/project/pyspotter)
 ![PyPI](https://img.shields.io/pypi/v/pyspotter)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5805519.svg)](https://doi.org/10.5281/zenodo.5805519)
 [![Donate](https://img.shields.io/badge/Donate-Buy%20me%20a%20Chai-teal)](https://www.buymeacoffee.com/samapriya)
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/samapriya)
 

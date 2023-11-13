@@ -1,9 +1,11 @@
 # pyspotter: Simple CLI for SofarOcean API
 
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=plastic&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/samapriya/)
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=flat&logo=medium&logoColor=white)](https://medium.com/@samapriyaroy)
 [![Twitter URL](https://img.shields.io/twitter/follow/samapriyaroy?style=social)](https://twitter.com/intent/follow?screen_name=samapriyaroy)
-![](https://tokei.rs/b1/github/samapriya/pyspotter?category=code)
-![](https://tokei.rs/b1/github/samapriya/pyspotter?category=files)
+[![Mastodon Follow](https://img.shields.io/mastodon/follow/109627075086849826?domain=https%3A%2F%2Fmapstodon.space%2F)](https://mapstodon.space/@samapriya)
 [![CI pyspotter](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml/badge.svg)](https://github.com/samapriya/pyspotter/actions/workflows/package_ci.yml)
+[![Hits-of-Code](https://hitsofcode.com/github/open-oceans/pyspotter?branch=main)](https://hitsofcode.com/github/open-oceans/pyspotter?branch=main)
 ![PyPI - License](https://img.shields.io/pypi/l/pyspotter)
 [![Downloads](https://pepy.tech/badge/pyspotter)](https://pepy.tech/project/pyspotter)
 ![PyPI](https://img.shields.io/pypi/v/pyspotter)
@@ -24,14 +26,22 @@ Zenodo. https://doi.org/10.5281/zenodo.5805519
 ```
 
 ## Table of contents
-* [Installation](#installation)
-* [Getting started](#getting-started)
-* [pyspotter Simple CLI for Sofarocean API](#pyspotter-simple-cli-for-sofarocean-api)
-    * [pyspotter auth](#pyspotter-auth)
-    * [pyspotter reset](#pyspotter-reset)
-    * [pyspotter devlist](#pyspotter-devlist)
-    * [pyspotter spotcheck](#pyspotter-spotcheck)
-    * [pyspotter spotdata](#pyspotter-spotdata)
+- [pyspotter: Simple CLI for SofarOcean API](#pyspotter-simple-cli-for-sofarocean-api)
+      - [Citation](#citation)
+  - [Table of contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Getting started](#getting-started)
+  - [pyspotter Simple CLI for Sofarocean API](#pyspotter-simple-cli-for-sofarocean-api-1)
+    - [pyspotter auth](#pyspotter-auth)
+    - [pyspotter reset](#pyspotter-reset)
+    - [pyspotter devlist](#pyspotter-devlist)
+    - [pyspotter spotcheck](#pyspotter-spotcheck)
+    - [pyspotter spotdata](#pyspotter-spotdata)
+  - [Changelog](#changelog)
+      - [v0.0.5](#v005)
+      - [v0.0.4](#v004)
+      - [v0.0.3](#v003)
+      - [v0.0.2](#v002)
 
 
 ## Installation
