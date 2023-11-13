@@ -139,5 +139,5 @@ nav:
       - Data export: projects/device-export.md
   - Global Tools:
       - Global biweekly Snapshot: projects/snapshot.md
-      - Global latest Snapshot: projects/spotter-latest.md
+      - Global latest Snapshot: projects/spot-latest.md
   - Changelog: changelog.md

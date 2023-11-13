@@ -2,7 +2,7 @@
 
 This tool will simply print the names of all devices to which you have access, instead of trying to remember the list. This tool requires no user input.
 
-![pyspotter_devices](https://user-images.githubusercontent.com/6677629/147421382-138a03b9-d2e1-4f55-92be-15f88e1ac9e5.gif)
+![pyspotter_devlist](https://github.com/open-oceans/pyspotter/assets/6677629/2fef1c74-f35d-4105-983b-582401ed59a3)
 
 ```
 usage: pyspotter devlist [-h]

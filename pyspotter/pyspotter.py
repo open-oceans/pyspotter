@@ -74,14 +74,15 @@ ob1 = Solution()
 
 
 # Get package version
+def version_latest(package):
+    response = requests.get(f"https://pypi.org/pypi/{package}/json")
+    latest_version = response.json()["info"]["version"]
+    return latest_version
+
+
 def pyspotter_version():
-    url = "https://pypi.org/project/pyspotter/"
-    source = requests.get(url)
-    html_content = source.text
-    soup = BeautifulSoup(html_content, "html.parser")
-    company = soup.find("h1")
     vcheck = ob1.compareVersion(
-        company.string.strip().split(" ")[-1],
+        version_latest("pyspotter"),
         pkg_resources.get_distribution("pyspotter").version,
     )
     if vcheck == 1:
@@ -92,7 +93,7 @@ def pyspotter_version():
         print(
             "Current version of pyspotter is {} upgrade to lastest version: {}".format(
                 pkg_resources.get_distribution("pyspotter").version,
-                company.string.strip().split(" ")[-1],
+                version_latest("pyspotter"),
             )
         )
         print(
@@ -106,7 +107,7 @@ def pyspotter_version():
         print(
             "Possibly running staging code {} compared to pypi release {}".format(
                 pkg_resources.get_distribution("pyspotter").version,
-                company.string.strip().split(" ")[-1],
+                version_latest("pyspotter"),
             )
         )
         print(
@@ -115,6 +116,19 @@ def pyspotter_version():
 
 
 pyspotter_version()
+
+# Go to the readMe
+def readme():
+    try:
+        a = webbrowser.open("https://pyspotter.openoceans.xyz", new=2)
+        if a == False:
+            print("Your setup does not have a monitor to display the webpage")
+            print(" Go to {}".format("https://pyspotter.openoceans.xyz"))
+    except Exception as error:
+        print(error)
+
+def read_from_parser(args):
+    readme()
 
 
 # set credentials
@@ -137,6 +151,9 @@ def auth(usr):
     if usr is None:
         usr = input("Enter email: ")
     pwd = getpass.getpass("Enter password: ")
+    while len(pwd) == 0:
+        logging.error("Password cannot be empty")
+        pwd = getpass.getpass("Enter password: ")
     data = {"username": usr, "password": pwd, "skipRedirect": "true"}
 
     response = requests.post(
@@ -448,17 +465,16 @@ def spot_check(spot_id):
             f"Spot check failed with error code {response.status_code}: {response.json()['message']}"
         )
 
-
 def spotcheck_from_parser(args):
     spot_check(spot_id=args.sid)
 
 
-def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
-    waves_list = []
-    wind_list = []
-    sst_list = []
+def spot_data(spot_id, dtype, folder):
+    if dtype == "sst":
+        dtype = "surfaceTemp"
     if not spot_id.startswith("SPOT-"):
         spot_id = f"SPOT-{spot_id}"
+
     obj = TimezoneFinder()
     params = {
         "spotterId": [spot_id],
@@ -468,112 +484,43 @@ def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
     headers = {
         "token": tokenize(),
     }
+
     response = requests.get(
         "https://api.sofarocean.com/api/wave-data", headers=headers, params=params
     )
+
     if response.status_code == 200:
         spotter = response.json()
         print("\n" + f"Fetching info for Spotter {spot_id}" + "\n")
-        if (
-            not "surfaceTemp" in spotter["data"]
-            or len(spotter["data"]["surfaceTemp"]) == 0
-            and dtype == "sst"
-        ):
-            sys.exit("No surfaceTemp data found")
-        else:
-            for readings in spotter["data"]["surfaceTemp"]:
-                readings["date"] = readings["timestamp"].split("T")[0]
-                readings["spotter_id"] = spot_id
-                sst_list.append(readings)
-        if (
-            not "waves" in spotter["data"]
-            or len(spotter["data"]["waves"]) == 0
-            and dtype == "wave"
-        ):
-            sys.exit("No waves data found")
-        else:
-            for readings in spotter["data"]["waves"]:
-                readings["date"] = readings["timestamp"].split("T")[0]
-                readings["spotter_id"] = spot_id
-                waves_list.append(readings)
-        if (
-            not "wind" in spotter["data"]
-            or len(spotter["data"]["wind"]) == 0
-            and dtype == "wind"
-        ):
-            sys.exit("No wind data found")
-        else:
-            for readings in spotter["data"]["wind"]:
-                readings["date"] = readings["timestamp"].split("T")[0]
-                readings["spotter_id"] = spot_id
-                wind_list.append(readings)
+        #print(spotter["data"].get("surfaceTemp"))
+        if not spotter["data"].get(dtype):
+            sys.exit(f"No {dtype} data found")
+
+        data_list = spotter["data"][dtype]
+
+        for readings in data_list:
+            readings["date"] = readings["timestamp"].split("T")[0]
+            readings["spotter_id"] = spot_id
+
+        df = pd.DataFrame(data_list)
+
+        if "date" in df.columns:
+            df.sort_values(by="date", inplace=True)
+            df["timestamp"] = pd.to_datetime(df["timestamp"])
+            df["system:time_start"] = df["timestamp"].apply(
+                datetime_to_epoch_milliseconds
+            )
+            for key, group in df.groupby("date"):
+                print(f"Processing {spot_id}_{key}_{dtype}.csv")
+                group.to_csv(
+                    os.path.join(folder, f"{spot_id}_{key}_{dtype}.csv"),
+                    index=False,
+                    sep=",",
+                )
     else:
         sys.exit(
             f"Failed with status_code: {response.status_code}: {response.json()['message']}"
         )
-
-    if dtype == "wave":
-        csv_columns = [
-            "significantWaveHeight",
-            "peakPeriod",
-            "meanPeriod",
-            "peakDirection",
-            "peakDirectionalSpread",
-            "meanDirection",
-            "meanDirectionalSpread",
-            "timestamp",
-            "latitude",
-            "longitude",
-            "date",
-            "spotter_id",
-        ]
-        main_list = waves_list
-    elif dtype == "wind":
-        csv_columns = [
-            "speed",
-            "direction",
-            "seasurfaceId",
-            "latitude",
-            "longitude",
-            "timestamp",
-            "date",
-            "spotter_id",
-        ]
-        main_list = wind_list
-    elif dtype == "sst":
-        csv_columns = [
-            "degrees",
-            "latitude",
-            "longitude",
-            "timestamp",
-            "date",
-            "spotter_id",
-        ]
-        main_list = sst_list
-
-    # define a fuction for key
-    def key_func(k):
-        return k["date"]
-
-    # sort INFO data by 'company' key.
-    INFO = sorted(main_list, key=key_func)
-
-    for key, value in groupby(INFO, key_func):
-        print(f"Processing {spot_id}_{key}_{dtype}.csv")
-        dict_data = list(value)
-        try:
-            with open(
-                os.path.join(folder, f"{spot_id}_{key}_{dtype}.csv"), "w"
-            ) as csvfile:
-                writer = csv.DictWriter(
-                    csvfile, fieldnames=csv_columns, delimiter=",", lineterminator="\n"
-                )
-                writer.writeheader()
-                for data in dict_data:
-                    writer.writerow(data)
-        except IOError:
-            print("I/O error")
-
 
 def spot_data_from_parser(args):
     spot_data(spot_id=args.sid, dtype=args.dtype, folder=args.folder)
@@ -582,6 +529,11 @@ def spot_data_from_parser(args):
 def main(args=None):
     parser = argparse.ArgumentParser(description="Simple CLI for Sofarocean API")
     subparsers = parser.add_subparsers()
+
+    parser_read = subparsers.add_parser(
+        "readme", help="Go to the web based pyspotter cli readme page"
+    )
+    parser_read.set_defaults(func=read_from_parser)
 
     parser_auth = subparsers.add_parser(
         "auth", help="Authenticates and saves your API token"

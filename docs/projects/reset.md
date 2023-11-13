@@ -4,4 +4,4 @@ For some reason if you need to reset your token , this will allow you to use you
 
 ```pyspotter reset```
 
-![pyspotter_reset](https://user-images.githubusercontent.com/6677629/147421249-f2a7ceeb-7d24-41dd-bb50-6bef30913dbc.gif)
+![pyspotter_reset](https://github.com/open-oceans/pyspotter/assets/6677629/8cd8fd28-769b-4f05-a7ea-fec447b2a612)

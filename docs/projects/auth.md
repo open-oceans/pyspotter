@@ -4,4 +4,4 @@ This tool allows you to save your authentication token, this is then used for au
 
 ``` pyspotter auth```
 
-![pyspotter_auth](https://user-images.githubusercontent.com/6677629/147421243-6ca937c4-9614-42ae-9b49-82b3b2d4e286.gif)
+![pyspotter_auth](https://github.com/open-oceans/pyspotter/assets/6677629/ad97c5ec-4b8f-463a-bfb9-5682cfacf74a)
