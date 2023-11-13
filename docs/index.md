@@ -14,12 +14,11 @@
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/samapriya)
 
 
-SofarOcean is creating one of the largest commercial ocean observation grids with its smart buoys (spotters) & smart mooring. Spotter delivers high-fidelity, real-time wave, wind, and temperature data from anywhere. Sofar is also focused on providing this dataset to researchers and users of the data and this tool was an attemp to simple parse spotter information. They also have an offical client for doing many of these functions which can be found here [sofar-api-client-python](https://github.com/sofarocean/sofar-api-client-python). You can also find their [indepth API and documentation here](https://docs.sofarocean.com/)
+SofarOcean is actively shaping one of the most extensive commercial ocean observation networks through innovative smart buoys (spotters) and advanced mooring technology. The Spotter, a key component, delivers real-time, high-fidelity data on waves, wind, and temperature from any location in the ocean. Sofar's commitment extends to providing this valuable dataset to researchers and data users. This tool is an endeavor to simplify the parsing of spotter information, focusing on basic API functionalities, including authentication protocols, token reset, and data export for seamless integration with platforms like Google Earth Engine.
 
-This tool is an attempt to parse out some of the basic functionalities of the API including but not limited to tool like authentication protocols, token reset and data export for easy use in other platforms like google earth engine.
+While SofarOcean offers an official client with comprehensive functions, this tool, available [here](https://github.com/sofarocean/sofar-api-client-python), addresses specific tasks including but not limited to tools like authentication protocols, token reset, and data export for easy use in other platforms like Google Earth Engine. You can also find their [indepth API and documentation here](https://docs.sofarocean.com/)
 
-
-**Disclaimer: This is an unofficial tool. Is not licensed or endorsed by SofarOcean. It is created and maintained by Samapriya Roy.**
+**Disclaimer: This is an unofficial tool and is neither licensed nor endorsed by SofarOcean. It is created and maintained by Samapriya Roy.**
 
 #### Citation
 
