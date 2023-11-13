@@ -55,6 +55,7 @@ logging.basicConfig(
     level=logging.INFO, format="[%(asctime)s] %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
 )
 
+
 class Solution:
     def compareVersion(self, version1, version2):
         versions1 = [int(v) for v in version1.split(".")]
@@ -70,6 +71,7 @@ class Solution:
 
 
 ob1 = Solution()
+
 
 # Get package version
 def pyspotter_version():
@@ -113,6 +115,7 @@ def pyspotter_version():
 
 
 pyspotter_version()
+
 
 # set credentials
 def auth(usr):
@@ -211,54 +214,67 @@ def devlist():
 def devlist_from_parser(args):
     devlist()
 
+
 def marine_dashboard():
     global_spotter_list = []
     headers = {
         "token": tokenize(),
     }
     params = {
-        'includeWindData': 'true',
+        "includeWindData": "true",
     }
 
-    response = requests.get('https://api.sofarocean.com/oceans-api/latest-data', params=params, headers=headers)
-    for spotter_results in response.json()['data']:
+    response = requests.get(
+        "https://api.sofarocean.com/oceans-api/latest-data",
+        params=params,
+        headers=headers,
+    )
+    for spotter_results in response.json()["data"]:
         global_spotter_list.append(spotter_results)
     return global_spotter_list
+
 
 def datetime_to_epoch_milliseconds(dt):
     epoch = datetime.datetime(1970, 1, 1, tzinfo=pytz.utc)
     delta = dt - epoch
     return int(delta.total_seconds() * 1000)
 
-def marine_global(sid,exp):
+
+def marine_global(sid, exp):
+    if not sid.startswith("SPOT-") and sid != "global":
+        sid = f"SPOT-{sid}"
     master_dashboard_ids = marine_dashboard()
     headers = {
         "token": tokenize(),
     }
     end = datetime.datetime.utcnow()
-    #end = end.replace(hour=0, minute=0, second=0, microsecond=0)
+    # end = end.replace(hour=0, minute=0, second=0, microsecond=0)
     start = end + relativedelta(days=-15)
     end = end.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     start = start.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
-    logging.info(
-        f"Searching between Start date {str(start)} and End date {str(end)}"
-    )
-    st = str(start).split('T')[0]
-    et = str(end).split('T')[0]
-    final_path = os.path.join(exp,f"{sid}_{st}_{et}.csv")
-    global_df_list =[]
+    logging.info(f"Searching between Start date {str(start)} and End date {str(end)}")
+    st = str(start).split("T")[0]
+    et = str(end).split("T")[0]
+    final_path = os.path.join(exp, f"{sid}_{st}_{et}.csv")
+    global_df_list = []
     if not os.path.exists(final_path):
         try:
-            if sid=="global":
-                for i,sid in enumerate(master_dashboard_ids):
+            if sid == "global":
+                for i, sid in enumerate(master_dashboard_ids):
                     response = requests.get(
-                        f'https://api.sofarocean.com/oceans-api/wave-data?spotterId={sid}&startDate={start}&endDate={end}',
+                        f"https://api.sofarocean.com/oceans-api/wave-data?spotterId={sid}&startDate={start}&endDate={end}",
                         headers=headers,
                     )
-                    if response.status_code == 200 and len(response.json()['data']['waves'])>0:
-                        print(f"Processed {i} of {len(master_dashboard_ids)} records",end="\r")
-                        #geojson_data = json.dumps(response.json(), indent=2)
-                        df = pd.DataFrame(response.json()['data']['waves'])
+                    if (
+                        response.status_code == 200
+                        and len(response.json()["data"]["waves"]) > 0
+                    ):
+                        print(
+                            f"Processed {i} of {len(master_dashboard_ids)} records",
+                            end="\r",
+                        )
+                        # geojson_data = json.dumps(response.json(), indent=2)
+                        df = pd.DataFrame(response.json()["data"]["waves"])
                         df["timestamp"] = pd.to_datetime(df["timestamp"])
                         df["system:time_start"] = df["timestamp"].apply(
                             datetime_to_epoch_milliseconds
@@ -266,12 +282,14 @@ def marine_global(sid,exp):
                         global_df_list.append(df)
             else:
                 response = requests.get(
-                    f'https://api.sofarocean.com/oceans-api/wave-data?spotterId={sid}&startDate={start}&endDate={end}',
+                    f"https://api.sofarocean.com/oceans-api/wave-data?spotterId={sid}&startDate={start}&endDate={end}",
                     headers=headers,
                 )
-                logging.info(f"Found a total of {len(response.json()['data']['waves'])} records")
-                #geojson_data = json.dumps(response.json(), indent=2)
-                df = pd.DataFrame(response.json()['data']['waves'])
+                logging.info(
+                    f"Found a total of {len(response.json()['data']['waves'])} records"
+                )
+                # geojson_data = json.dumps(response.json(), indent=2)
+                df = pd.DataFrame(response.json()["data"]["waves"])
                 df["timestamp"] = pd.to_datetime(df["timestamp"])
                 df["system:time_start"] = df["timestamp"].apply(
                     datetime_to_epoch_milliseconds
@@ -280,16 +298,120 @@ def marine_global(sid,exp):
             global_df = pd.concat(global_df_list, ignore_index=True)
             global_cleaned = global_df.dropna()
             global_cleaned.to_csv(final_path, index=False)
-            logging.info(f"Wrote {global_cleaned.shape[0]} records to csv {os.path.basename(final_path)}")
+            logging.info(
+                f"Wrote {global_cleaned.shape[0]} records to csv {os.path.basename(final_path)}"
+            )
         except Exception as error:
             logging.error(error)
     else:
-        logging.info(f"Marine dashboard export for {sid} already exists at {os.path.basename(final_path)}: SKIPPING")
+        logging.info(
+            f"Marine dashboard export for {sid} already exists at {os.path.basename(final_path)}: SKIPPING"
+        )
 
-#marine_global(sid='global',exp=r'C:\tmp\aqua')
-#marine_info(sid='SPOT-30168D',exp=r'C:\tmp\aqua')
+
 def global_snapshot_from_parser(args):
-    marine_global(spot_id=args.sid,exp=args.export)
+    marine_global(sid=args.sid, exp=args.export)
+
+
+def drop_keys(data, keep_key):
+    modified_data = data.copy()
+    modified_data = {
+        k: v for k, v in modified_data.items() if not k.startswith("track")
+    }
+    drop_prefix = "waves" if keep_key == "wind" else "wind"
+    modified_data = {
+        k: v for k, v in modified_data.items() if not k.startswith(drop_prefix)
+    }
+    modified_data.pop("spotterName", None)
+    return modified_data
+
+
+def flatten_dict(d, parent_key="", sep="_"):
+    items = {}
+    for k, v in d.items():
+        new_key = f"{parent_key}{k}" if parent_key else k
+        if isinstance(v, dict):
+            items.update(flatten_dict(v, new_key, sep=sep))
+        elif isinstance(v, list):
+            for i, item in enumerate(v):
+                items.update(flatten_dict(item, f"{new_key}{sep}", sep=sep))
+        else:
+            items[new_key] = v
+    return items
+
+
+def json_formatter(data, keep_key):
+    modified_data = drop_keys(data, keep_key)
+    flattened_data = flatten_dict(modified_data)
+    keys_to_remove = []
+    for key in flattened_data.keys():
+        if "latitude" in key or "longitude" in key or "timestamp" in key:
+            keys_to_remove.append(key)
+    for key in keys_to_remove:
+        if "latitude" in key:
+            flattened_data["latitude"] = flattened_data.pop(key, None)
+        elif "longitude" in key:
+            flattened_data["longitude"] = flattened_data.pop(key, None)
+        elif "timestamp" in key:
+            flattened_data["timestamp"] = flattened_data.pop(key, None)
+    df = pd.DataFrame([flattened_data])
+    df[f"{keep_key}_timestamp"] = pd.to_datetime(df[f"timestamp"])
+    df["system:time_start"] = df[f"{keep_key}_timestamp"].apply(
+        datetime_to_epoch_milliseconds
+    )
+    return df
+
+
+def snapshot_latest(exp, keep_key):
+    if keep_key == "wave":
+        keep_key = "waves"
+    utc_date_today = datetime.datetime.utcnow()
+    final_path = os.path.join(
+        exp, f"global_latest_{keep_key}_{str(utc_date_today).split(' ')[0]}.csv"
+    )
+    headers = {
+        "token": tokenize(),
+    }
+    params = {
+        "includeWindData": "true",
+    }
+
+    response = requests.get(
+        "https://api.sofarocean.com/oceans-api/latest-data",
+        params=params,
+        headers=headers,
+    )
+    logging.info(
+        f"Processing latest data snapshot for {len(response.json()['data'])} records"
+    )
+    id_list = [items for items in response.json()["data"]]
+    global_df_list = []
+    spotter_errors = []
+    try:
+        for i, id in enumerate(id_list):
+            try:
+                id_json = response.json()["data"][id]
+                df_spotter = json_formatter(id_json, keep_key=keep_key)
+                global_df_list.append(df_spotter)
+                print(f"Processed {i+1} of {len(id_list)} records", end="\r")
+            except KeyError as key_error:
+                spotter_errors.append(id)
+                continue
+        global_df_list = [df.dropna(axis=1, how="all") for df in global_df_list]
+        global_df = pd.concat(global_df_list, ignore_index=True)
+        if not global_df.empty:
+            global_cleaned = global_df.dropna()
+            global_cleaned.to_csv(final_path, index=False)
+            logging.info(f"Wrote {global_cleaned.shape[0]} records to csv {final_path}")
+        else:
+            logging.error("No valid data to write.")
+    except Exception as error:
+        logging.error(f"An unexpected error occurred: {error}")
+
+
+def global_latest_from_parser(args):
+    snapshot_latest(keep_key=args.dtype, exp=args.export)
+
 
 def spot_check(spot_id):
     if not spot_id.startswith("SPOT-"):
@@ -428,6 +550,7 @@ def spot_data(spot_id, dtype, folder):  #'SPOT-0222'
             "spotter_id",
         ]
         main_list = sst_list
+
     # define a fuction for key
     def key_func(k):
         return k["date"]
@@ -494,6 +617,33 @@ def main(args=None):
         "--folder", help="Folder to export CSV data", required=True
     )
     parser_spot_data.set_defaults(func=spot_data_from_parser)
+
+    parser_global_snapshot = subparsers.add_parser(
+        "snapshot", help="Saves the last 14 day data for a single or global spotters"
+    )
+    required_named = parser_global_snapshot.add_argument_group(
+        "Required named arguments."
+    )
+    required_named.add_argument(
+        "--export", help="Full path to folder to export results", required=True
+    )
+    optional_named = parser_global_snapshot.add_argument_group(
+        "Optional named arguments"
+    )
+    optional_named.add_argument("--sid", help="Spotter ID", default="global")
+    parser_global_snapshot.set_defaults(func=global_snapshot_from_parser)
+
+    parser_global_latest = subparsers.add_parser(
+        "snapshot-latest", help="Saves the latest wind/wave data from global spotters"
+    )
+    required_named = parser_global_latest.add_argument_group(
+        "Required named arguments."
+    )
+    required_named.add_argument(
+        "--export", help="Full path to folder to export results", required=True
+    )
+    required_named.add_argument("--dtype", help="Data type wind/wave", required=True)
+    parser_global_latest.set_defaults(func=global_latest_from_parser)
 
     args = parser.parse_args()
 

@@ -7,13 +7,14 @@ def readme():
         return f.read()
 setuptools.setup(
     name='pyspotter',
-    version='0.0.6',
+    version='0.0.7',
     packages=find_packages(),
     url='https://github.com/samapriya/pyspotter',
     install_requires=['requests>=2.23.1',
                       'timezonefinder>=5.2.0',
                       'pytz>=2020.1',
                       'beautifulsoup4>=4.9.3',
+                      'pandas>=2.1.2',
                       'python_dateutil>=2.8.2'],
     license='MIT',
     long_description=open('README.md').read(),
