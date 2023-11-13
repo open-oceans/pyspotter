@@ -38,6 +38,7 @@ import logging
 import os
 import sys
 import time
+import webbrowser
 from itertools import groupby
 from os.path import expanduser
 
