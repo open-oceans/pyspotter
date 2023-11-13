@@ -41,7 +41,17 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://github.com/samapriya/projects/snapshot/</loc>
+         <lastmod>2023-11-13</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://github.com/samapriya/projects/spot-check/</loc>
+         <lastmod>2023-11-13</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://github.com/samapriya/projects/spot-latest/</loc>
          <lastmod>2023-11-13</lastmod>
          <changefreq>daily</changefreq>
     </url>
