@@ -23,6 +23,6 @@ While SofarOcean offers an official client with comprehensive functions, this to
 #### Citation
 
 ```
-Samapriya Roy. (2021). samapriya/pyspotter: Simple CLI for SofarOcean API (0.0.6).
-Zenodo. https://doi.org/10.5281/zenodo.5805519
+Samapriya Roy. (2023). open-oceans/pyspotter: Simple CLI for SofarOcean API (0.0.7).
+Zenodo. https://doi.org/10.5281/zenodo.10117433
 ```
